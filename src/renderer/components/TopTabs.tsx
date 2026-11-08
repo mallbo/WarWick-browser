@@ -31,10 +31,10 @@ export const TopTabs: React.FC<TopTabsProps> = ({
           <div
             key={tab.id}
             onClick={() => onSwitchTab(tab.id)}
-            className={`group relative flex items-center h-7 px-2.5 max-w-[190px] min-w-[110px] rounded-t-md text-xs cursor-pointer border-t-2 transition-all duration-150 ${
+            className={`group relative flex items-center h-7 px-2.5 max-w-[190px] min-w-[110px] rounded-t-md text-xs cursor-pointer border-t-2 spring-tab ${
               isActive
-                ? 'bg-[var(--bg-surface)] text-[var(--text-primary)] border-[var(--accent)] shadow-sm'
-                : 'bg-transparent text-[var(--text-secondary)] border-transparent hover:bg-[var(--bg-surface-hover)] hover:text-[var(--text-primary)]'
+                ? 'bg-[var(--bg-surface)] text-[var(--text-primary)] border-[var(--accent)] shadow-md shadow-black/20'
+                : 'bg-transparent text-[var(--text-secondary)] border-transparent hover:bg-[var(--bg-surface-hover)] hover:text-[var(--text-primary)] opacity-75 hover:opacity-100'
             }`}
             title={tab.url}
           >

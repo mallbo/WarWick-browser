@@ -70,6 +70,14 @@ export const MarketingHome: React.FC<MarketingHomeProps> = ({
     }
   ];
 
+  const handleCardMouseMove = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    e.currentTarget.style.setProperty('--mouse-x', `${x}px`);
+    e.currentTarget.style.setProperty('--mouse-y', `${y}px`);
+  };
+
   const handleSendPrompt = (e: React.FormEvent) => {
     e.preventDefault();
     const trimmed = promptInput.trim();
@@ -191,8 +199,9 @@ export const MarketingHome: React.FC<MarketingHomeProps> = ({
               <button
                 key={action.id}
                 type="button"
+                onMouseMove={handleCardMouseMove}
                 onClick={() => handleCardClick(action.prompt)}
-                className={`flex flex-col justify-between p-4 rounded-xl bg-[var(--bg-panel)] border border-[var(--border-subtle)] hover:border-[var(--border-accent)] hover:bg-[var(--bg-surface-hover)] transition-all group cursor-pointer relative overflow-hidden ${
+                className={`flex flex-col justify-between p-4 rounded-xl border border-[var(--border-subtle)] spotlight-card active:scale-[0.98] transition-all group cursor-pointer relative overflow-hidden ${
                   isAr ? 'text-right' : 'text-left'
                 }`}
               >
@@ -226,8 +235,9 @@ export const MarketingHome: React.FC<MarketingHomeProps> = ({
         {/* 4. Funnel Autopsy Diagnostic Banner */}
         <button
           type="button"
+          onMouseMove={handleCardMouseMove}
           onClick={onOpenFunnelAutopsy}
-          className={`w-full max-w-3xl flex items-center gap-3.5 p-4 rounded-xl bg-[var(--bg-panel)] border border-[var(--border-accent-soft)] hover:border-[var(--border-accent)] hover:bg-[var(--bg-surface-hover)] transition-all group cursor-pointer shadow-xl shadow-black/30 ${
+          className={`w-full max-w-3xl flex items-center gap-3.5 p-4 rounded-xl border border-[var(--border-accent-soft)] spotlight-card active:scale-[0.99] transition-all group cursor-pointer shadow-xl shadow-black/30 ${
             isAr ? 'text-right' : 'text-left'
           }`}
         >
