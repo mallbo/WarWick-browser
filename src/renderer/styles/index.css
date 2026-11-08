@@ -1,0 +1,138 @@
+@import "tailwindcss";
+
+/*
+ * WarWick appearance tokens.
+ *
+ * The renderer writes these variables at runtime from the ThemeSettings
+ * contract (see src/renderer/theme.ts). Values below are the approved
+ * Wolf Gold / Warm Black defaults used before settings finish loading.
+ */
+@theme {
+  --color-app: #121009;
+  --color-sidebar: #17140d;
+  --color-panel: #1b1811;
+  --color-surface: #211d13;
+  --color-surface-hover: #292416;
+  --color-tab-active: #2b2516;
+  --color-border-subtle: #2a2519;
+  --color-border-strong: #3a3323;
+  --color-accent: #f2b632;
+  --color-accent-bright: #f6cb5c;
+  --color-text-primary: #f0ece0;
+  --color-text-secondary: #b3ad9c;
+  --color-text-muted: #85806f;
+}
+
+:root {
+  --bg-app: #121009;
+  --bg-sidebar: #17140d;
+  --bg-panel: #1b1811;
+  --bg-surface: #211d13;
+  --bg-surface-hover: #292416;
+  --bg-surface-active: #322b1b;
+  --bg-tab-active: #2d2718;
+  --border-subtle: #2a2519;
+  --border-strong: #3a3323;
+  --border-accent: rgba(242, 182, 50, 0.420);
+  --border-accent-soft: rgba(242, 182, 50, 0.250);
+  --text-primary: #f0ece0;
+  --text-secondary: #b3ad9c;
+  --text-muted: #85806f;
+  --accent: #f2b632;
+  --accent-bright: #f6cb5c;
+  --accent-strong: #d99a20;
+  --accent-soft: rgba(242, 182, 50, 0.130);
+  --accent-soft-strong: rgba(242, 182, 50, 0.200);
+  --accent-contrast: #17130a;
+  --shadow-color: rgba(0, 0, 0, 0.34);
+
+  /* Density tokens */
+  --row-height: 36px;
+  --row-gap: 4px;
+  --control-pad-y: 6px;
+  --control-pad-x: 10px;
+}
+
+html[data-density="compact"] {
+  --row-height: 30px;
+  --row-gap: 2px;
+  --control-pad-y: 4px;
+  --control-pad-x: 8px;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: var(--bg-app);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  user-select: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--accent-soft-strong);
+  color: var(--text-primary);
+}
+
+/* Electron Frameless Window Drag Utilities */
+.app-drag {
+  -webkit-app-region: drag;
+}
+
+.app-no-drag {
+  -webkit-app-region: no-drag;
+}
+
+/* Theme-aware scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* Tab title text gradient fade mask */
+.tab-title-mask {
+  -webkit-mask-image: linear-gradient(to right, black 80%, transparent 100%);
+  mask-image: linear-gradient(to right, black 80%, transparent 100%);
+}
+
+/*
+ * Density helpers. Components use these classes/variables for the rows that
+ * benefit most from compact mode without changing their layout contract.
+ */
+.density-row {
+  height: var(--row-height);
+}
+.density-stack {
+  gap: var(--row-gap);
+}
+.density-control-y {
+  padding-top: var(--control-pad-y);
+  padding-bottom: var(--control-pad-y);
+}
+.density-control-x {
+  padding-left: var(--control-pad-x);
+  padding-right: var(--control-pad-x);
+}
+
+/* Keep native range controls on the active accent. */
+input[type="range"] {
+  accent-color: var(--accent);
+}
