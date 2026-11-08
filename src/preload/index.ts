@@ -8,7 +8,11 @@ import type {
   ViewBounds,
   HistoryEntry,
   BookmarkItem,
-  SessionData
+  SessionData,
+  FunnelAutopsyRequest,
+  FunnelAutopsyProgress,
+  FunnelAutopsyReport,
+  FunnelAutopsyErrorPayload
 } from '../shared/types';
 import { IPC_CHANNELS } from '../shared/types';
 
@@ -167,6 +171,52 @@ const warwickApi: WarwickApi = {
       ipcRenderer.on('shortcuts:open-settings', listener);
       return () => {
         ipcRenderer.removeListener('shortcuts:open-settings', listener);
+      };
+    },
+    onToggleFunnelAutopsy: (callback: () => void): (() => void) => {
+      const listener = () => callback();
+      ipcRenderer.on('shortcuts:toggle-funnel-autopsy', listener);
+      return () => {
+        ipcRenderer.removeListener('shortcuts:toggle-funnel-autopsy', listener);
+      };
+    }
+  },
+
+  funnelAutopsy: {
+    start: (request: FunnelAutopsyRequest): Promise<{ runId: string }> => {
+      return ipcRenderer.invoke(IPC_CHANNELS.FUNNEL_AUTOPSY_START, request);
+    },
+    cancel: (runId: string): Promise<boolean> => {
+      return ipcRenderer.invoke(IPC_CHANNELS.FUNNEL_AUTOPSY_CANCEL, runId);
+    },
+    getReport: (runId: string): Promise<FunnelAutopsyReport | null> => {
+      return ipcRenderer.invoke(IPC_CHANNELS.FUNNEL_AUTOPSY_GET_REPORT, runId);
+    },
+    onProgress: (callback: (progress: FunnelAutopsyProgress) => void): (() => void) => {
+      const listener = (_event: Electron.IpcRendererEvent, progress: FunnelAutopsyProgress) => {
+        callback(progress);
+      };
+      ipcRenderer.on(IPC_CHANNELS.FUNNEL_AUTOPSY_PROGRESS, listener);
+      return () => {
+        ipcRenderer.removeListener(IPC_CHANNELS.FUNNEL_AUTOPSY_PROGRESS, listener);
+      };
+    },
+    onComplete: (callback: (report: FunnelAutopsyReport) => void): (() => void) => {
+      const listener = (_event: Electron.IpcRendererEvent, report: FunnelAutopsyReport) => {
+        callback(report);
+      };
+      ipcRenderer.on(IPC_CHANNELS.FUNNEL_AUTOPSY_COMPLETE, listener);
+      return () => {
+        ipcRenderer.removeListener(IPC_CHANNELS.FUNNEL_AUTOPSY_COMPLETE, listener);
+      };
+    },
+    onError: (callback: (error: FunnelAutopsyErrorPayload) => void): (() => void) => {
+      const listener = (_event: Electron.IpcRendererEvent, error: FunnelAutopsyErrorPayload) => {
+        callback(error);
+      };
+      ipcRenderer.on(IPC_CHANNELS.FUNNEL_AUTOPSY_ERROR, listener);
+      return () => {
+        ipcRenderer.removeListener(IPC_CHANNELS.FUNNEL_AUTOPSY_ERROR, listener);
       };
     }
   }

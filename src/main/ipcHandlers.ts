@@ -2,6 +2,7 @@ import { ipcMain, BrowserWindow } from 'electron';
 import type { TabManager } from './tabManager';
 import { AntigravityBridge } from './antigravityBridge';
 import type { StorageService } from './storageService';
+import type { FunnelAutopsyService } from './funnelAutopsy';
 import { extractActivePageContext, captureActivePageScreenshot } from './pageContextExtractor';
 import {
   IPC_CHANNELS,
@@ -12,14 +13,16 @@ import {
   type ViewBounds,
   type HistoryEntry,
   type BookmarkItem,
-  type SessionData
+  type SessionData,
+  type FunnelAutopsyRequest
 } from '../shared/types';
 
 export function registerIpcHandlers(
   mainWindow: BrowserWindow,
   tabManager: TabManager,
   storageService?: StorageService | AntigravityBridge | null,
-  antigravityBridge?: AntigravityBridge | null
+  antigravityBridge?: AntigravityBridge | null,
+  funnelAutopsyService?: FunnelAutopsyService | null
 ): void {
   // Support polymorphic caller patterns:
   // 1. (win, tabManager, storageService, antigravityBridge) [M5 canonical]
@@ -306,4 +309,26 @@ export function registerIpcHandlers(
     }
     return null;
   });
+
+  // Funnel Autopsy IPC Handlers
+  if (funnelAutopsyService) {
+    ipcMain.handle(
+      IPC_CHANNELS.FUNNEL_AUTOPSY_START,
+      async (_event, request: FunnelAutopsyRequest) => funnelAutopsyService.start(request)
+    );
+
+    ipcMain.handle(IPC_CHANNELS.FUNNEL_AUTOPSY_CANCEL, async (_event, runId: string) => {
+      return funnelAutopsyService.cancel(runId);
+    });
+
+    ipcMain.handle(IPC_CHANNELS.FUNNEL_AUTOPSY_GET_REPORT, async (_event, runId: string) => {
+      return funnelAutopsyService.getReport(runId);
+    });
+  } else {
+    ipcMain.handle(IPC_CHANNELS.FUNNEL_AUTOPSY_START, async () => {
+      throw new Error('Funnel Autopsy service is not available.');
+    });
+    ipcMain.handle(IPC_CHANNELS.FUNNEL_AUTOPSY_CANCEL, async () => false);
+    ipcMain.handle(IPC_CHANNELS.FUNNEL_AUTOPSY_GET_REPORT, async () => null);
+  }
 }

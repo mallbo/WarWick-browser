@@ -136,3 +136,263 @@ body,
 input[type="range"] {
   accent-color: var(--accent);
 }
+
+/* ===========================================================================
+ * Red Sarab — the mirage that runs from the WarWick portrait to the AI control.
+ * Warm ember red only: it should read as heat over the gold chrome, not neon.
+ * =========================================================================== */
+
+.sarab-hit {
+  outline: 1px solid rgba(240, 101, 58, 0.75);
+  outline-offset: 2px;
+}
+
+.sarab-band,
+.sarab-smoke,
+.sarab-core,
+.sarab-origin {
+  position: absolute;
+  transform-origin: 0 50%;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+.sarab-band {
+  border-radius: 9999px;
+  background: linear-gradient(
+    90deg,
+    rgba(214, 61, 36, 0) 0%,
+    rgba(214, 61, 36, 0.1) 34%,
+    rgba(226, 80, 50, 0.22) 68%,
+    rgba(255, 128, 84, 0.3) 92%,
+    rgba(255, 150, 110, 0) 100%
+  );
+  backdrop-filter: blur(2.5px) saturate(1.3);
+  -webkit-backdrop-filter: blur(2.5px) saturate(1.3);
+  animation: sarab-band 620ms cubic-bezier(0.22, 0.85, 0.24, 1) forwards;
+}
+
+.sarab-smoke {
+  border-radius: 9999px;
+  background: linear-gradient(
+    90deg,
+    rgba(214, 61, 36, 0) 0%,
+    rgba(214, 61, 36, 0.1) 28%,
+    rgba(226, 80, 50, 0.26) 62%,
+    rgba(255, 118, 76, 0.42) 88%,
+    rgba(255, 150, 110, 0) 100%
+  );
+  filter: blur(16px);
+  opacity: 0;
+  animation: sarab-smoke 720ms cubic-bezier(0.24, 0.8, 0.2, 1) forwards;
+}
+
+.sarab-smoke--slow {
+  filter: blur(28px);
+  animation-delay: 50ms;
+  animation-duration: 820ms;
+}
+
+.sarab-core {
+  border-radius: 9999px;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 90, 60, 0) 0%,
+    rgba(255, 96, 64, 0.28) 38%,
+    #ff6a40 74%,
+    #ffd0a8 94%,
+    rgba(255, 210, 170, 0) 100%
+  );
+  box-shadow: 0 0 12px rgba(226, 58, 34, 0.45);
+  opacity: 0;
+  animation: sarab-core 500ms cubic-bezier(0.2, 0.9, 0.2, 1) forwards;
+}
+
+.sarab-core--echo {
+  filter: blur(5px);
+  animation-delay: 60ms;
+  animation-duration: 580ms;
+}
+
+.sarab-origin {
+  position: absolute;
+  transform-origin: center;
+  width: 30px;
+  height: 30px;
+  margin-left: -15px;
+  margin-top: -15px;
+  border-radius: 9999px;
+  background: radial-gradient(
+    circle,
+    rgba(255, 132, 88, 0.75) 0%,
+    rgba(226, 58, 34, 0.32) 45%,
+    transparent 72%
+  );
+  filter: blur(2px);
+  animation: sarab-origin 420ms ease-out forwards;
+}
+
+.sarab-ember {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  margin-left: -3px;
+  margin-top: -3px;
+  border-radius: 9999px;
+  background: #ffb27a;
+  box-shadow: 0 0 10px rgba(255, 106, 64, 0.9);
+  animation: sarab-ember 700ms cubic-bezier(0.3, 0.7, 0.2, 1) forwards;
+}
+
+.sarab-ember--late {
+  width: 4px;
+  height: 4px;
+  margin-left: -2px;
+  margin-top: -2px;
+  animation-delay: 130ms;
+  animation-duration: 760ms;
+}
+
+.sarab-impact {
+  position: absolute;
+  width: 56px;
+  height: 56px;
+  margin-left: -28px;
+  margin-top: -28px;
+  border-radius: 9999px;
+  border: 1.5px solid rgba(240, 101, 58, 0.8);
+  box-shadow: 0 0 16px rgba(226, 58, 34, 0.28) inset;
+  animation: sarab-impact 320ms cubic-bezier(0.16, 0.84, 0.24, 1) 200ms both;
+  opacity: 0;
+}
+
+.sarab-flare {
+  position: absolute;
+  width: 110px;
+  height: 110px;
+  margin-left: -55px;
+  margin-top: -55px;
+  border-radius: 9999px;
+  background: radial-gradient(
+    circle,
+    rgba(255, 120, 80, 0.42) 0%,
+    rgba(226, 58, 34, 0.22) 42%,
+    transparent 70%
+  );
+  filter: blur(6px);
+  animation: sarab-flare 560ms ease-out 170ms both;
+  opacity: 0;
+}
+
+@keyframes sarab-band {
+  0% {
+    transform: rotate(var(--sarab-angle)) scaleX(0);
+    opacity: 0;
+  }
+  22% {
+    opacity: 0.65;
+  }
+  100% {
+    transform: rotate(var(--sarab-angle)) scaleX(1);
+    opacity: 0;
+  }
+}
+
+@keyframes sarab-smoke {
+  0% {
+    transform: rotate(var(--sarab-angle)) scaleX(0.04) scaleY(0.5);
+    opacity: 0;
+  }
+  30% {
+    opacity: 0.7;
+  }
+  100% {
+    transform: rotate(var(--sarab-angle)) scaleX(1) scaleY(1.15);
+    opacity: 0;
+  }
+}
+
+@keyframes sarab-core {
+  0% {
+    transform: rotate(var(--sarab-angle)) scaleX(0);
+    opacity: 0;
+  }
+  14% {
+    opacity: 1;
+  }
+  62% {
+    transform: rotate(var(--sarab-angle)) scaleX(0.94);
+    opacity: 0.95;
+  }
+  100% {
+    transform: rotate(var(--sarab-angle)) scaleX(1.03);
+    opacity: 0;
+  }
+}
+
+@keyframes sarab-origin {
+  0% {
+    transform: scale(0.4);
+    opacity: 0.95;
+  }
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+
+@keyframes sarab-ember {
+  0% {
+    transform: translate(calc(-1 * var(--sarab-dx)), calc(-1 * var(--sarab-dy))) scale(0.5);
+    opacity: 0;
+  }
+  18% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(0, 0) scale(0.15);
+    opacity: 0;
+  }
+}
+
+@keyframes sarab-impact {
+  0% {
+    transform: scale(0.25);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1.9);
+    opacity: 0;
+  }
+}
+
+@keyframes sarab-flare {
+  0% {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+  35% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1.1);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sarab-band,
+  .sarab-smoke,
+  .sarab-core,
+  .sarab-origin,
+  .sarab-ember,
+  .sarab-impact,
+  .sarab-flare {
+    animation: none;
+    opacity: 0;
+  }
+}
+

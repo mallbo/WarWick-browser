@@ -342,7 +342,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               }`}
             >
               <Key size={14} />
-              <span>Antigravity AI</span>
+              <span>WarWick AI</span>
             </button>
 
             <button
@@ -644,7 +644,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     Copilot Drawer Width
                   </h3>
                   <p className="text-xs text-[var(--text-secondary)] mb-3">
-                    Default width for the Antigravity AI assistant drawer ({settings.aiPanelWidth}px).
+                    Default width for the WarWick AI assistant drawer ({settings.aiPanelWidth}px).
                   </p>
                   <input
                     type="range"
@@ -659,7 +659,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               </div>
             )}
 
-            {/* 2. Antigravity AI Tab */}
+            {/* 2. WarWick AI Tab */}
             {activeTab === 'ai' && (
               <div className="space-y-6">
                 <div>
@@ -682,13 +682,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       }`}
                     >
                       <div className="flex items-center justify-between mb-1.5">
-                        <span className="text-xs font-semibold text-[var(--accent)]">برنامج Antigravity على جهازك</span>
+                        <span className="text-xs font-semibold text-[var(--accent)]">محرك Antigravity المحلي</span>
                         {(settings.aiProvider || 'antigravity-local') === 'antigravity-local' && (
                           <div className="w-2 h-2 rounded-full bg-[var(--accent)]" />
                         )}
                       </div>
                       <span className="text-[11px] text-[var(--text-secondary)] leading-relaxed">
-                        مجاني وبدون API Key - متصل ببرنامج Antigravity المثبت ومسجل به.
+                        جاهز بدون مفتاح API — يعمل عبر جلسة Antigravity المثبّتة على جهازك.
                       </span>
                     </button>
 
@@ -821,7 +821,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     Model Context Protocol (MCP) Servers
                   </h3>
                   <p className="text-xs text-[var(--text-secondary)] mb-4">
-                    Connect local tools and databases directly to Antigravity via MCP stdio transports.
+                    Connect local tools and data sources to the WarWick assistant via MCP stdio transports.
                   </p>
 
                   {/* List of active servers */}

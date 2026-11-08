@@ -124,6 +124,10 @@ export class AntigravityBridge {
     return this.genAI;
   }
 
+  public getSettingsSnapshot(): AppSettings {
+    return { ...this.settings };
+  }
+
   public getBackgroundResearcher(): BackgroundResearcher | undefined {
     return this.backgroundResearcher;
   }

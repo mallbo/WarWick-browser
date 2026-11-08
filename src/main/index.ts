@@ -3,6 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { TabManager } from './tabManager';
 import { AntigravityBridge } from './antigravityBridge';
+import { FunnelAutopsyService } from './funnelAutopsy';
 import { registerIpcHandlers } from './ipcHandlers';
 import { StorageService } from './storageService';
 import { setupPrivacyShield } from './privacyShield';
@@ -21,6 +22,7 @@ let mainWindow: BrowserWindow | null = null;
 let tabManager: TabManager | null = null;
 let antigravityBridge: AntigravityBridge | null = null;
 let storageService: StorageService | null = null;
+let funnelAutopsyService: FunnelAutopsyService | null = null;
 
 async function createMainWindow(): Promise<BrowserWindow> {
   // Disable default menu for sleek frameless browser look
@@ -59,8 +61,11 @@ async function createMainWindow(): Promise<BrowserWindow> {
   // Instantiate AntigravityBridge with loaded settings
   antigravityBridge = new AntigravityBridge(win, appSettings);
 
+  // Instantiate the isolated Funnel Autopsy runner
+  funnelAutopsyService = new FunnelAutopsyService(win, antigravityBridge);
+
   // Register typed IPC channels
-  registerIpcHandlers(win, tabManager, storageService, antigravityBridge);
+  registerIpcHandlers(win, tabManager, storageService, antigravityBridge, funnelAutopsyService);
 
   // Prevent main shell from navigating away on dropped links or window.open
   win.webContents.setWindowOpenHandler(({ url }) => {
@@ -113,6 +118,10 @@ async function createMainWindow(): Promise<BrowserWindow> {
   }, 1000);
 
   win.on('closed', () => {
+    if (funnelAutopsyService) {
+      void funnelAutopsyService.destroy();
+      funnelAutopsyService = null;
+    }
     if (antigravityBridge) {
       antigravityBridge.destroy().catch(() => {});
       antigravityBridge = null;
@@ -179,6 +188,10 @@ app.on('before-quit', async (event) => {
     if (antigravityBridge) {
       await antigravityBridge.destroy().catch(() => {});
       antigravityBridge = null;
+    }
+    if (funnelAutopsyService) {
+      await funnelAutopsyService.destroy().catch(() => {});
+      funnelAutopsyService = null;
     }
     if (tabManager) {
       tabManager.destroyAll();

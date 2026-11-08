@@ -122,7 +122,7 @@ export class TabManager {
   }
 
   private deriveInitialTitle(url: string): string {
-    if (!url || url === 'about:blank' || url.startsWith('warwick://')) return 'WarWick Marketing AI';
+    if (!url || url === 'about:blank' || url.startsWith('warwick://')) return 'WarWick AI Browser';
     try {
       const parsed = new URL(url);
       return parsed.hostname.replace(/^www\./, '') || 'New Tab';
@@ -163,6 +163,12 @@ export class TabManager {
 
     // Dark zinc background to prevent white flashing
     view.setBackgroundColor('#121009');
+
+    // For about:blank or start pages, keep native view hidden so React canvas is visible
+    const isStartUrl = !targetUrl || targetUrl === 'about:blank' || targetUrl.startsWith('warwick://');
+    try {
+      view.setVisible(!isStartUrl);
+    } catch {}
 
     const state: TabState = {
       id,
@@ -288,11 +294,20 @@ export class TabManager {
         return;
       }
 
-      // 5. Ctrl+J: Toggle Antigravity AI Drawer
+      // 5. Ctrl+J: Toggle WarWick AI Drawer
       if (isMod && !input.shift && !input.alt && (key === 'j' || code === 'KeyJ')) {
         event.preventDefault();
         try {
           this.mainWindow.webContents.send('shortcuts:toggle-ai-drawer');
+        } catch {}
+        return;
+      }
+
+      // 5b. Ctrl+Shift+F: Toggle Funnel Autopsy
+      if (isMod && input.shift && !input.alt && (key === 'f' || code === 'KeyF')) {
+        event.preventDefault();
+        try {
+          this.mainWindow.webContents.send('shortcuts:toggle-funnel-autopsy');
         } catch {}
         return;
       }
@@ -408,10 +423,14 @@ export class TabManager {
     }
 
     this.activeTabId = id;
+    const isNextStartUrl = !nextTab.state.url || nextTab.state.url === 'about:blank' || nextTab.state.url.startsWith('warwick://');
     try {
       this.mainWindow.contentView.addChildView(nextTab.view);
       nextTab.view.setBounds(this.currentBounds);
-      if (nextTab.view?.webContents && !nextTab.view.webContents.isDestroyed?.()) {
+      try {
+        nextTab.view.setVisible(!isNextStartUrl);
+      } catch {}
+      if (!isNextStartUrl && nextTab.view?.webContents && !nextTab.view.webContents.isDestroyed?.()) {
         nextTab.view.webContents.focus();
       }
     } catch (e) {
@@ -552,6 +571,11 @@ export class TabManager {
 
     const targetUrl = this.resolveNavigationUrl(input);
     if (!targetUrl) return false;
+
+    const isStartUrl = targetUrl === 'about:blank' || targetUrl.startsWith('warwick://');
+    try {
+      tabItem.view.setVisible(!isStartUrl);
+    } catch {}
 
     tabItem.state.isCrashed = false;
     tabItem.view.webContents.loadURL(targetUrl).catch((err) => {

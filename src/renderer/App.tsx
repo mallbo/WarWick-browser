@@ -7,6 +7,8 @@ import { NavBar } from './components/NavBar';
 import { AntigravityDrawer } from './components/AntigravityDrawer';
 import { SettingsModal } from './components/SettingsModal';
 import { MarketingHome } from './components/MarketingHome';
+import { SarabOverlay } from './components/SarabOverlay';
+import { FunnelAutopsyPanel } from './components/FunnelAutopsyPanel';
 
 export default function App() {
   const [tabs, setTabs] = useState<TabState[]>([]);
@@ -15,6 +17,7 @@ export default function App() {
   const [isAgentOpen, setIsAgentOpen] = useState<boolean>(true);
   const [agentDraftPrompt, setAgentDraftPrompt] = useState<string>('');
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
+  const [isFunnelAutopsyOpen, setIsFunnelAutopsyOpen] = useState<boolean>(false);
   const [isBookmarked, setIsBookmarked] = useState<boolean>(false);
   const [theme, setTheme] = useState<ThemeSettings>(DEFAULT_THEME);
 
@@ -64,6 +67,16 @@ export default function App() {
     applyTheme(normalized);
   }, []);
 
+  const handleOpenSettings = useCallback(() => {
+    setIsFunnelAutopsyOpen(false);
+    setIsSettingsOpen(true);
+  }, []);
+
+  const handleOpenFunnelAutopsy = useCallback(() => {
+    setIsSettingsOpen(false);
+    setIsFunnelAutopsyOpen(true);
+  }, []);
+
   // Synchronize WebContentsView bounds via ResizeObserver + rAF
   const reportBounds = useCallback(() => {
     if (!webContainerRef.current) return;
@@ -79,6 +92,11 @@ export default function App() {
       window.warwickApi.tabs.setBounds(bounds);
     }
   }, []);
+
+  const handleCloseFunnelAutopsy = useCallback(() => {
+    setIsFunnelAutopsyOpen(false);
+    requestAnimationFrame(() => reportBounds());
+  }, [reportBounds]);
 
   useEffect(() => {
     const container = webContainerRef.current;
@@ -151,12 +169,12 @@ export default function App() {
     };
   }, [activeTab?.url]);
 
-  // When Settings Modal is open OR on Start Page, hide WebContentsView so React is completely visible!
+  // When a modal/panel is open OR on Start Page, hide WebContentsView so React is completely visible!
   useEffect(() => {
     if (window.warwickApi?.tabs?.setVisible) {
-      window.warwickApi.tabs.setVisible(!isSettingsOpen && !isStartPage);
+      window.warwickApi.tabs.setVisible(!isSettingsOpen && !isFunnelAutopsyOpen && !isStartPage);
     }
-  }, [isSettingsOpen, isStartPage]);
+  }, [isSettingsOpen, isFunnelAutopsyOpen, isStartPage, activeTabId]);
 
   // Tab operations
   const handleCreateTab = useCallback(async () => {
@@ -287,6 +305,12 @@ export default function App() {
         setIsSettingsOpen((prev) => !prev);
       }));
     }
+    if (window.warwickApi?.shortcuts?.onToggleFunnelAutopsy) {
+      unsubs.push(window.warwickApi.shortcuts.onToggleFunnelAutopsy(() => {
+        setIsSettingsOpen(false);
+        setIsFunnelAutopsyOpen((prev) => !prev);
+      }));
+    }
     return () => {
       for (const u of unsubs) u();
     };
@@ -387,6 +411,32 @@ export default function App() {
     return () => window.removeEventListener('keydown', handleKeyDown, { capture: true });
   }, [activeTabId, tabs, handleCreateTab, handleCloseTab, handleCycleTab, handleReload, handleGoBack, handleGoForward]);
 
+  // Funnel Autopsy owns its own accelerators so the core browser shortcut
+  // matrix stays independent from optional feature panels.
+  useEffect(() => {
+    const handleAutopsyKeyDown = (e: KeyboardEvent) => {
+      const isMod = e.ctrlKey || e.metaKey;
+      const key = e.key.toLowerCase();
+      if (isMod && e.shiftKey && !e.altKey && key === 'f') {
+        e.preventDefault();
+        setIsSettingsOpen(false);
+        setIsFunnelAutopsyOpen((prev) => !prev);
+        return;
+      }
+      if (e.key === 'Escape' && isFunnelAutopsyOpen) {
+        e.preventDefault();
+        setIsFunnelAutopsyOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleAutopsyKeyDown, { capture: true });
+    return () => window.removeEventListener('keydown', handleAutopsyKeyDown, { capture: true });
+  }, [isFunnelAutopsyOpen]);
+
+  // Settings always takes precedence over the feature panel.
+  useEffect(() => {
+    if (isSettingsOpen) setIsFunnelAutopsyOpen(false);
+  }, [isSettingsOpen]);
+
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-[var(--bg-app)] text-[var(--text-primary)] font-sans antialiased">
       {/* 1. Arc/Strawberry-style Vertical Tabs Sidebar */}
@@ -400,7 +450,8 @@ export default function App() {
         onCloseTab={handleCloseTab}
         onTogglePin={handleTogglePin}
         onToggleMute={handleToggleMute}
-        onOpenSettings={() => setIsSettingsOpen(true)}
+        onOpenSettings={handleOpenSettings}
+        onOpenFunnelAutopsy={handleOpenFunnelAutopsy}
         onTransitionEnd={reportBounds}
       />
 
@@ -409,6 +460,12 @@ export default function App() {
         {/* Top Header / Omnibox Bar */}
         <NavBar
           activeTab={activeTab}
+          tabs={tabs}
+          onSwitchTab={handleSwitchTab}
+          onCloseTab={handleCloseTab}
+          onCreateTab={handleCreateTab}
+          onTogglePin={handleTogglePin}
+          onToggleMute={handleToggleMute}
           onNavigate={handleNavigate}
           onReload={handleReload}
           onGoBack={handleGoBack}
@@ -426,12 +483,13 @@ export default function App() {
             <MarketingHome
               onTriggerAi={handleTriggerAi}
               onNavigate={handleNavigate}
+              onOpenFunnelAutopsy={handleOpenFunnelAutopsy}
             />
           )}
         </div>
       </div>
 
-      {/* 4. Collapsible Antigravity Copilot Drawer */}
+      {/* 4. Collapsible AI Assistant Drawer */}
       <AntigravityDrawer
         isOpen={isAgentOpen}
         onClose={() => setIsAgentOpen(false)}
@@ -448,6 +506,16 @@ export default function App() {
         theme={theme}
         onThemeChange={handleThemeChange}
       />
+
+      {/* 6. Funnel Autopsy — AI persona diagnostics */}
+      <FunnelAutopsyPanel
+        isOpen={isFunnelAutopsyOpen}
+        onClose={handleCloseFunnelAutopsy}
+        defaultUrl={!isStartPage ? activeTab?.url : ''}
+      />
+
+      {/* 7. Red Sarab overlay — AI control click feedback */}
+      <SarabOverlay />
     </div>
   );
 }

@@ -2,13 +2,14 @@ import React from 'react';
 import {
   PanelLeftClose,
   PanelLeftOpen,
-  Settings
+  Settings,
+  Skull
 } from 'lucide-react';
 import type { TabState } from '../../shared/types';
 import { THEME_CONSTANTS } from '../../shared/types';
 import { NewTabButton } from './NewTabButton';
 import { TabBar } from './TabBar';
-import { warwickWolfImg } from '../assets';
+import { WolfAvatar } from './WolfAvatar';
 
 export interface SidebarProps {
   tabs: TabState[];
@@ -21,6 +22,7 @@ export interface SidebarProps {
   onTogglePin?: (id: string) => void;
   onToggleMute?: (id: string) => void;
   onOpenSettings?: () => void;
+  onOpenFunnelAutopsy?: () => void;
   onTransitionEnd?: () => void;
 }
 
@@ -35,6 +37,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onTogglePin,
   onToggleMute,
   onOpenSettings,
+  onOpenFunnelAutopsy,
   onTransitionEnd,
 }) => {
   return (
@@ -55,10 +58,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div className="h-12 flex items-center justify-between px-3 border-b border-[var(--border-subtle)] app-drag">
           {!isCollapsed ? (
             <div className="flex items-center gap-2 overflow-hidden whitespace-nowrap app-no-drag">
-              <img
-                src={warwickWolfImg}
+              <WolfAvatar
+                id="warwick-brand-avatar"
+                size={24}
                 alt="WarWick Wolf"
-                className="w-6 h-6 rounded-full object-cover border border-[var(--border-accent)] shadow-sm shadow-black/30 shrink-0"
               />
               <span className="font-semibold text-xs tracking-wide text-[var(--text-primary)] flex items-center gap-1.5">
                 WarWick
@@ -69,10 +72,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
           ) : (
             <div className="mx-auto app-no-drag">
-              <img
-                src={warwickWolfImg}
+              <WolfAvatar
+                id="warwick-brand-avatar"
+                size={24}
                 alt="WarWick Wolf"
-                className="w-6 h-6 rounded-full object-cover border border-[var(--border-accent)] shadow-sm shrink-0"
               />
             </div>
           )}
@@ -102,7 +105,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
       />
 
       {/* 4. Bottom Footer: Settings & Status */}
-      <div className="p-2 border-t border-[var(--border-subtle)] shrink-0 bg-[var(--bg-sidebar)] app-no-drag">
+      <div className="p-2 border-t border-[var(--border-subtle)] shrink-0 bg-[var(--bg-sidebar)] app-no-drag space-y-1">
+        <button
+          onClick={onOpenFunnelAutopsy}
+          className={`w-full flex items-center ${
+            isCollapsed ? 'justify-center px-0' : 'justify-start px-2.5'
+          } py-2 rounded-lg text-xs text-[var(--accent)] hover:text-[var(--accent-bright)] bg-[var(--accent-soft)] hover:bg-[var(--bg-surface-hover)] border border-[var(--border-accent-soft)] transition-colors gap-2 group`}
+          title="Funnel Autopsy (Ctrl+Shift+F)"
+        >
+          <Skull size={15} className="group-hover:-rotate-6 transition-transform duration-200" />
+          {!isCollapsed && <span className="font-medium text-xs">Funnel Autopsy</span>}
+        </button>
         <button
           onClick={onOpenSettings}
           className={`w-full flex items-center ${

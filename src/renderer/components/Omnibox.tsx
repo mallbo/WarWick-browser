@@ -200,7 +200,13 @@ export const Omnibox: React.FC<OmniboxProps> = ({
             <span>↵ Enter</span>
           </div>
         ) : (
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1.5">
+            {activeTab?.url && activeTab.url !== 'about:blank' && (
+              <span className="hidden md:inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/25 text-amber-300 text-[10px] font-mono shadow-[0_0_8px_rgba(217,119,6,0.15)]">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                <span>Marketing Lens</span>
+              </span>
+            )}
             <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-[var(--bg-surface-hover)] text-[var(--text-muted)] border border-[var(--border-subtle)]">
               Ctrl+K
             </span>

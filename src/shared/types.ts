@@ -315,6 +315,251 @@ export interface WarwickShortcutsApi {
   onFocusOmnibox: (callback: () => void) => () => void;
   onToggleAiDrawer: (callback: () => void) => () => void;
   onOpenSettings: (callback: () => void) => () => void;
+  onToggleFunnelAutopsy?: (callback: () => void) => () => void;
+}
+
+// ---------------------------------------------------------------------------
+// Funnel Autopsy
+// ---------------------------------------------------------------------------
+
+export type FunnelPersonaId =
+  | 'skeptic'
+  | 'bargain-hunter'
+  | 'impulse-buyer'
+  | 'mobile-first'
+  | 'non-technical';
+
+export interface FunnelPersonaDefinition {
+  id: FunnelPersonaId;
+  name: string;
+  englishName: string;
+  description: string;
+  icon: 'shield' | 'tag' | 'zap' | 'smartphone' | 'help';
+  defaultSelected: boolean;
+}
+
+export const FUNNEL_PERSONAS: FunnelPersonaDefinition[] = [
+  {
+    id: 'skeptic',
+    name: 'المتشكك',
+    englishName: 'The Skeptic',
+    description: 'لا يثق بسهولة. يبحث عن الضمان والتقييمات والأدلة قبل أي خطوة.',
+    icon: 'shield',
+    defaultSelected: true
+  },
+  {
+    id: 'bargain-hunter',
+    name: 'صائد الصفقات',
+    englishName: 'The Bargain Hunter',
+    description: 'يريد سعرًا واضحًا وعرضًا مفهومًا. يهرب من الغموض والرسوم المخفية.',
+    icon: 'tag',
+    defaultSelected: true
+  },
+  {
+    id: 'impulse-buyer',
+    name: 'المندفع',
+    englishName: 'The Impulse Buyer',
+    description: 'قراره سريع. إذا لم يجد CTA واضحًا فوق الطية، يغادر فورًا.',
+    icon: 'zap',
+    defaultSelected: true
+  },
+  {
+    id: 'mobile-first',
+    name: 'الموبايل أولًا',
+    englishName: 'Mobile First',
+    description: 'يتصفح من شاشة صغيرة. الأزرار الصغيرة والفورم الطويل يقتلونه.',
+    icon: 'smartphone',
+    defaultSelected: false
+  },
+  {
+    id: 'non-technical',
+    name: 'غير التقني',
+    englishName: 'Non-Technical',
+    description: 'يحتاج لغة بسيطة وخطوات قليلة. المصطلحات والفورم الطويل يربكانه.',
+    icon: 'help',
+    defaultSelected: false
+  }
+];
+
+export type FunnelAbandonmentStage =
+  | 'hero'
+  | 'offer'
+  | 'cta'
+  | 'form'
+  | 'trust'
+  | 'checkout'
+  | 'completed';
+
+export type FunnelPersonaVerdict = 'converted' | 'hesitated' | 'abandoned';
+
+export type FunnelFrictionSeverity = 'critical' | 'high' | 'medium' | 'low';
+
+export type FunnelFrictionCategory =
+  | 'trust'
+  | 'price'
+  | 'cta'
+  | 'form'
+  | 'clarity'
+  | 'mobile'
+  | 'speed'
+  | 'accessibility';
+
+export interface FunnelCta {
+  text: string;
+  tag: string;
+  href?: string;
+  type?: string;
+  isAboveFold: boolean;
+  isPrimary: boolean;
+}
+
+export interface FunnelFormField {
+  type: string;
+  name?: string;
+  label?: string;
+  placeholder?: string;
+  required: boolean;
+}
+
+export interface FunnelFormSummary {
+  fieldCount: number;
+  action?: string;
+  method?: string;
+}
+
+export interface FunnelPageSnapshot {
+  url: string;
+  title: string;
+  metaDescription: string;
+  h1: string;
+  h2s: string[];
+  ctas: FunnelCta[];
+  primaryCta?: FunnelCta;
+  forms: FunnelFormSummary[];
+  fields: FunnelFormField[];
+  prices: string[];
+  trustSignals: string[];
+  navLinks: Array<{ text: string; href: string }>;
+  textSample: string;
+  wordCount: number;
+  imageCount: number;
+  imagesMissingAlt: number;
+  hasVideo: boolean;
+  hasChat: boolean;
+  hasFaq: boolean;
+  hasTestimonials: boolean;
+  hasGuarantee: boolean;
+  hasUrgency: boolean;
+  hasCountdown: boolean;
+  hasCookieBanner: boolean;
+  hasPricingSection: boolean;
+  hasContact: boolean;
+  pageHeight: number;
+  viewportHeight: number;
+  viewportWidth: number;
+  formCount: number;
+  fieldCount: number;
+  requiredFieldCount: number;
+  buttonCount: number;
+  linkCount: number;
+}
+
+export type FunnelEvidenceStage = 'hero' | 'mid' | 'cta' | 'form' | 'bottom';
+
+export interface FunnelEvidence {
+  id: string;
+  personaId: FunnelPersonaId;
+  stage: FunnelEvidenceStage;
+  label: string;
+  description: string;
+  screenshotBase64?: string;
+  url: string;
+  capturedAt: number;
+}
+
+export interface FunnelPersonaResult {
+  personaId: FunnelPersonaId;
+  name: string;
+  englishName: string;
+  verdict: FunnelPersonaVerdict;
+  score: number;
+  abandonmentStage: FunnelAbandonmentStage;
+  causeOfDeath: string;
+  confidence: number;
+  timeToDecisionMs: number;
+  frictionSignals: string[];
+  evidenceIds: string[];
+}
+
+export interface FunnelFriction {
+  id: string;
+  severity: FunnelFrictionSeverity;
+  category: FunnelFrictionCategory;
+  title: string;
+  description: string;
+  recommendation: string;
+  affectedPersonas: FunnelPersonaId[];
+  evidenceIds: string[];
+}
+
+export interface FunnelAutopsyReport {
+  runId: string;
+  url: string;
+  finalUrl: string;
+  title: string;
+  createdAt: number;
+  durationMs: number;
+  overallScore: number;
+  verdict: string;
+  summary: string;
+  personas: FunnelPersonaResult[];
+  frictions: FunnelFriction[];
+  evidence: FunnelEvidence[];
+  page: FunnelPageSnapshot;
+  aiEnriched: boolean;
+  engine: 'heuristic' | 'heuristic+ai';
+}
+
+export interface FunnelAutopsyRequest {
+  url: string;
+  personaIds?: FunnelPersonaId[];
+  captureScreenshots?: boolean;
+  maxSteps?: number;
+}
+
+export type FunnelAutopsyStage =
+  | 'queued'
+  | 'loading'
+  | 'scanning'
+  | 'walking'
+  | 'capturing'
+  | 'analyzing'
+  | 'complete'
+  | 'error'
+  | 'cancelled';
+
+export interface FunnelAutopsyProgress {
+  runId: string;
+  stage: FunnelAutopsyStage;
+  message: string;
+  progressPercent: number;
+  personaId?: FunnelPersonaId;
+  currentUrl?: string;
+}
+
+export interface FunnelAutopsyErrorPayload {
+  runId: string;
+  message: string;
+  cancelled?: boolean;
+}
+
+export interface WarwickFunnelAutopsyApi {
+  start: (request: FunnelAutopsyRequest) => Promise<{ runId: string }>;
+  cancel: (runId: string) => Promise<boolean>;
+  getReport: (runId: string) => Promise<FunnelAutopsyReport | null>;
+  onProgress: (callback: (progress: FunnelAutopsyProgress) => void) => () => void;
+  onComplete: (callback: (report: FunnelAutopsyReport) => void) => () => void;
+  onError: (callback: (error: FunnelAutopsyErrorPayload) => void) => () => void;
 }
 
 export interface WarwickApi {
@@ -327,6 +572,7 @@ export interface WarwickApi {
   session?: WarwickSessionApi;
   window?: WarwickWindowApi;
   shortcuts?: WarwickShortcutsApi;
+  funnelAutopsy?: WarwickFunnelAutopsyApi;
 }
 
 export const IPC_CHANNELS = {
@@ -373,6 +619,14 @@ export const IPC_CHANNELS = {
   WINDOW_MAXIMIZE: 'window:maximize',
   WINDOW_CLOSE: 'window:close',
   WINDOW_IS_MAXIMIZED: 'window:is-maximized',
+
+  // Funnel Autopsy
+  FUNNEL_AUTOPSY_START: 'funnel-autopsy:start',
+  FUNNEL_AUTOPSY_CANCEL: 'funnel-autopsy:cancel',
+  FUNNEL_AUTOPSY_GET_REPORT: 'funnel-autopsy:get-report',
+  FUNNEL_AUTOPSY_PROGRESS: 'funnel-autopsy:progress',
+  FUNNEL_AUTOPSY_COMPLETE: 'funnel-autopsy:complete',
+  FUNNEL_AUTOPSY_ERROR: 'funnel-autopsy:error',
 } as const;
 
 // Global Window augmentation

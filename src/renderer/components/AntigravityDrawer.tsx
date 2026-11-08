@@ -19,13 +19,11 @@ import {
   AlertCircle,
   Layers,
   ArrowUpRight,
-  ShoppingCart,
-  Target,
-  Flame,
-  TrendingUp
+  Globe,
+  Target
 } from 'lucide-react';
 import type { TabState, ResearchStep, PageContext } from '../../shared/types';
-import { warwickWolfImg } from '../assets';
+import { WolfAvatar } from './WolfAvatar';
 
 // =============================================================================
 // Interfaces & Types
@@ -68,32 +66,32 @@ interface QuickActionConfig {
 
 const QUICK_ACTIONS: QuickActionConfig[] = [
   {
-    id: 'cro_audit',
-    label: 'فحص CRO للمتجر',
-    shortDesc: 'تحليل تدفق الشراء والـ CTA',
-    icon: ShoppingCart,
-    prompt: 'قم بإجراء فحص شامل لمعدل التحويل (CRO) لهذا المتجر/الموقع، واذكر أهم 5 نقاط احتكاك تمنع الزوار من إتمام الشراء، مع حلول فورية قابلة للتطبيق.'
+    id: 'summarize',
+    label: 'لخّص الصفحة',
+    shortDesc: 'النقاط الأساسية في ثوانٍ',
+    icon: FileText,
+    prompt: 'لخّص هذه الصفحة في نقاط واضحة، مع ذكر أهم التفاصيل والأرقام والاستنتاجات.'
   },
   {
-    id: 'competitor_analysis',
-    label: 'تحليل المتجر والمنافسين',
-    shortDesc: 'نقاط القوة والفجوات التسويقية',
+    id: 'translate',
+    label: 'ترجمة فورية',
+    shortDesc: 'إلى العربية بدون مغادرة التبويب',
+    icon: Globe,
+    prompt: 'ترجم محتوى هذه الصفحة إلى العربية مع الحفاظ على المصطلحات التقنية كما هي.'
+  },
+  {
+    id: 'compare',
+    label: 'تحليل ومقارنة',
+    shortDesc: 'الفروق الجوهرية وأيها أنسب',
     icon: Target,
-    prompt: 'حلل هذا المتجر مقارنة بأبرز المنافسين في مجاله: ما هي نقاط القوة والضعف؟ وما هي الفجوات التسويقية التي يمكن استغلالها لزيادة المبيعات؟'
+    prompt: 'حلّل محتوى هذه الصفحة وقارنه بأهم البدائل، واذكر الفروق الجوهرية وأي خيار أنسب ولماذا.'
   },
   {
-    id: 'ad_hooks',
-    label: 'استخراج هوكات إعلانية',
-    shortDesc: '5 هوكات وزوايا بيع مبتكرة',
-    icon: Flame,
-    prompt: 'استخرج 5 هوكات إعلانية توقف السكرول (Scroll-stopping hooks) وزوايا تسويقية جذابة لترويج هذا المتجر ومنتجاته على TikTok و Meta و Google.'
-  },
-  {
-    id: 'offer_audit',
-    label: 'تدقيق صفحة الهبوط والعرض',
-    shortDesc: 'قوة العنوان والضمان والندرة',
-    icon: TrendingUp,
-    prompt: 'حلل قوة العرض التسويقي (Main Offer) في هذه الصفحة: هل العنوان جذاب؟ هل الضمان يزيل مخاوف الشراء؟ وكيف نزيد الثقة في أول 3 ثوانٍ؟'
+    id: 'research',
+    label: 'بحث معمّق',
+    shortDesc: 'مصادر متعددة بخلاصة موثقة',
+    icon: Layers,
+    prompt: 'ابحث بعمق في هذا الموضوع من عدة مصادر، ولخّص النتائج مع روابط المصادر.'
   }
 ];
 
@@ -606,7 +604,7 @@ export const AntigravityDrawer: React.FC<AntigravityDrawerProps> = ({
           {
             ...assistantPlaceholder,
             isStreaming: false,
-            error: err instanceof Error ? err.message : 'Failed to communicate with Antigravity agent'
+            error: err instanceof Error ? err.message : 'Failed to communicate with the WarWick assistant'
           }
         ]);
       }
@@ -701,17 +699,10 @@ export const AntigravityDrawer: React.FC<AntigravityDrawerProps> = ({
         {/* 1. Header */}
         <div className="h-12 border-b border-[var(--border-subtle)] px-4 flex items-center justify-between shrink-0 bg-[var(--bg-sidebar)]">
           <div className="flex items-center gap-2 overflow-hidden">
-            <img
-              src={warwickWolfImg}
-              alt="WarWick"
-              className="w-6 h-6 rounded-full object-cover border border-[var(--border-accent)] shadow-sm shadow-black/30 shrink-0"
-            />
+            <WolfAvatar size={24} alt="WarWick" />
             <div className="flex flex-col overflow-hidden">
-              <span className="font-semibold text-xs text-[var(--text-primary)] flex items-center gap-1.5">
-                Antigravity Marketing
-                <span className="text-[9px] font-semibold px-1 py-0.2 rounded bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--border-accent-soft)]">
-                  AI
-                </span>
+              <span className="font-semibold text-xs text-[var(--text-primary)]">
+                WarWick AI
               </span>
               {activeTab?.title && (
                 <span className="text-[10px] text-[var(--text-secondary)] truncate max-w-[190px]">
@@ -750,7 +741,7 @@ export const AntigravityDrawer: React.FC<AntigravityDrawerProps> = ({
             <div className="flex items-center justify-between text-[11px] text-[var(--text-secondary)] px-0.5">
               <span className="font-semibold uppercase tracking-wider text-[10px] text-[var(--accent)] flex items-center gap-1">
                 <Layers size={11} className="text-[var(--accent)]" />
-                أدوات التسويق السريعة
+                أدوات سريعة
               </span>
               <button
                 type="button"
@@ -760,10 +751,10 @@ export const AntigravityDrawer: React.FC<AntigravityDrawerProps> = ({
                     ? 'bg-[var(--accent-soft-strong)] text-[var(--accent-bright)] border-[var(--border-accent)]'
                     : 'bg-[var(--bg-surface)] text-[var(--text-muted)] border-[var(--border-subtle)] hover:text-[var(--text-secondary)]'
                 }`}
-                title="Toggle screenshot capture with action"
+                title="إرفاق لقطة شاشة مع الطلب"
               >
                 <Camera size={11} />
-                <span>+Screenshot</span>
+                <span>+لقطة</span>
               </button>
             </div>
 
@@ -795,9 +786,9 @@ export const AntigravityDrawer: React.FC<AntigravityDrawerProps> = ({
               <div className="w-10 h-10 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-subtle)] flex items-center justify-center text-[var(--accent)] mb-2 shadow-sm">
                 <Sparkles size={20} />
               </div>
-              <p className="font-medium text-[var(--text-primary)] text-xs mb-1">In-Page Context Ready</p>
+              <p className="font-medium text-[var(--text-primary)] text-xs mb-1">الصفحة جاهزة للعمل عليها</p>
               <p className="text-[11px] leading-relaxed max-w-[240px]">
-                Ask questions about the current page, summarize lengthy articles, or generate code snippets.
+                اسأل عن الصفحة الحالية، لخّص مقالًا طويلًا، أو اطلب أي مهمة — أو اكتب سؤالك بالأسفل.
               </p>
             </div>
           ) : (
@@ -899,7 +890,7 @@ export const AntigravityDrawer: React.FC<AntigravityDrawerProps> = ({
                   setInputPrompt(e.target.value);
                   if (onDraftPromptChange) onDraftPromptChange(e.target.value);
                 }}
-                placeholder={isStreaming ? 'Antigravity is streaming...' : 'Ask about this store, CRO, or marketing...'}
+                placeholder={isStreaming ? 'WarWick is thinking...' : 'اسأل عن هذه الصفحة أو اطلب أي مهمة...'}
                 disabled={isStreaming}
                 className="bg-transparent border-none text-xs text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none flex-1 disabled:opacity-50"
               />

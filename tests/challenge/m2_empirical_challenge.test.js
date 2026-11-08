@@ -336,7 +336,7 @@ describe('Milestone 2 Empirical Challenger Suite (Adversarial Oracles & Stress)'
 
       const blankTab = tm.createTab('about:blank');
       // Internal home surface title (was "New Tab" before the UI unification).
-      assert.strictEqual(blankTab.title, 'WarWick Marketing AI');
+      assert.strictEqual(blankTab.title, 'WarWick AI Browser');
 
       const ghTab = tm.createTab('https://github.com/facebook/react');
       assert.strictEqual(ghTab.title, 'github.com');
