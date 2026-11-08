@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import type { TabState, ViewBounds, ThemeSettings } from '../shared/types';
 import { DEFAULT_THEME, normalizeThemeSettings } from '../shared/types';
 import { applyTheme } from './theme';
+import type { Language } from './i18n';
 import { Sidebar } from './components/Sidebar';
 import { NavBar } from './components/NavBar';
 import { AntigravityDrawer } from './components/AntigravityDrawer';
@@ -20,6 +21,23 @@ export default function App() {
   const [isFunnelAutopsyOpen, setIsFunnelAutopsyOpen] = useState<boolean>(false);
   const [isBookmarked, setIsBookmarked] = useState<boolean>(false);
   const [theme, setTheme] = useState<ThemeSettings>(DEFAULT_THEME);
+  const [language, setLanguage] = useState<Language>(() => {
+    try {
+      return (localStorage.getItem('warwick_lang') as Language) || 'en';
+    } catch {
+      return 'en';
+    }
+  });
+
+  const handleToggleLanguage = useCallback(() => {
+    setLanguage((prev) => {
+      const next: Language = prev === 'en' ? 'ar' : 'en';
+      try {
+        localStorage.setItem('warwick_lang', next);
+      } catch {}
+      return next;
+    });
+  }, []);
 
   const webContainerRef = useRef<HTMLDivElement | null>(null);
 
@@ -438,7 +456,10 @@ export default function App() {
   }, [isSettingsOpen]);
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-[var(--bg-app)] text-[var(--text-primary)] font-sans antialiased">
+    <div
+      dir={language === 'ar' ? 'rtl' : 'ltr'}
+      className="flex h-screen w-screen overflow-hidden bg-[var(--bg-app)] text-[var(--text-primary)] font-sans antialiased"
+    >
       {/* 1. Arc/Strawberry-style Vertical Tabs Sidebar */}
       <Sidebar
         tabs={tabs}
@@ -475,6 +496,8 @@ export default function App() {
           onToggleAgent={() => setIsAgentOpen((prev) => !prev)}
           isBookmarked={isBookmarked}
           onToggleBookmark={handleToggleBookmark}
+          language={language}
+          onToggleLanguage={handleToggleLanguage}
         />
 
         {/* 3. Native WebContentsView Placeholder (#web-container) */}
@@ -484,6 +507,8 @@ export default function App() {
               onTriggerAi={handleTriggerAi}
               onNavigate={handleNavigate}
               onOpenFunnelAutopsy={handleOpenFunnelAutopsy}
+              language={language}
+              onToggleLanguage={handleToggleLanguage}
             />
           )}
         </div>

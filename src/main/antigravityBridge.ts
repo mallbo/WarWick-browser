@@ -518,7 +518,19 @@ export class AntigravityBridge {
             return;
           }
           console.error('Antigravity CLI spawn error:', err);
-          this.emitChunk(`\n\n⚠️ تعذر تشغيل برنامج Antigravity المحلي (${err.message}). تأكد من تثبيت Antigravity على جهازك.`);
+          if ((err as any)?.code === 'ENOENT') {
+            this.emitChunk(
+              `\n\n💡 **Local Antigravity CLI Not Found / لم يتم العثور على محرك Antigravity المحلي**\n\n` +
+              `This computer does not have the local \`agy.exe\` engine installed.\n` +
+              `**To activate AI on this machine:**\n` +
+              `1. Open **Settings** (⚙️ bottom-left or press \`Ctrl+,\`).\n` +
+              `2. Paste your free **Google Gemini API Key** from https://aistudio.google.com\n` +
+              `3. Click Save to activate instant cloud intelligence.\n\n` +
+              `*لتشغيل الذكاء الاصطناعي على أي جهاز: افتح الإعدادات (Ctrl+,) وضع مفتاح Gemini API المجاني.*`
+            );
+          } else {
+            this.emitChunk(`\n\n⚠️ تعذر تشغيل برنامج Antigravity المحلي (${err.message}). تأكد من تثبيت Antigravity على جهازك.`);
+          }
           this.emitAction({
             runId,
             stage: 'error',

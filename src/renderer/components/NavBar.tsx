@@ -1,10 +1,12 @@
 import React, { useRef } from 'react';
-import { ChevronLeft, ChevronRight, RotateCw, Sparkles, ShieldCheck, Star } from 'lucide-react';
+import { ChevronLeft, ChevronRight, RotateCw, Sparkles, ShieldCheck, Star, Languages } from 'lucide-react';
 import { Omnibox } from './Omnibox';
 import { WindowControls } from './WindowControls';
 import { TopTabs } from './TopTabs';
 import { playSarab } from './SarabOverlay';
 import type { TabState } from '../../shared/types';
+import type { Language } from '../i18n';
+import { translations } from '../i18n';
 
 const SARAB_LANDING_DELAY = 400;
 
@@ -25,6 +27,8 @@ export interface NavBarProps {
   onToggleAgent: () => void;
   isBookmarked?: boolean;
   onToggleBookmark?: () => void;
+  language?: Language;
+  onToggleLanguage?: () => void;
 }
 
 export const NavBar: React.FC<NavBarProps> = ({
@@ -43,10 +47,13 @@ export const NavBar: React.FC<NavBarProps> = ({
   isAgentOpen,
   onToggleAgent,
   isBookmarked,
-  onToggleBookmark
+  onToggleBookmark,
+  language = 'en',
+  onToggleLanguage
 }) => {
   const aiButtonRef = useRef<HTMLButtonElement | null>(null);
   const sarabBusyRef = useRef(false);
+  const t = translations[language].nav;
 
   const handleToggleAssistant = () => {
     if (sarabBusyRef.current) return;
@@ -92,13 +99,13 @@ export const NavBar: React.FC<NavBarProps> = ({
 
       {/* 2. Main Navigation Controls & Omnibox Row */}
       <div className="h-11 flex items-center px-3 gap-2.5 app-drag">
-        {/* Navigation Controls: Back, Forward, Reload */}
+        {/* Navigation Controls: Back, Forward, Reload, Bookmark */}
         <div className="flex items-center gap-1 text-[var(--text-secondary)] app-no-drag">
           <button
             onClick={onGoBack}
             disabled={!activeTab?.canGoBack}
             className="p-1.5 rounded-lg hover:bg-[var(--bg-surface-hover)] hover:text-[var(--text-primary)] disabled:opacity-25 disabled:hover:bg-transparent disabled:cursor-not-allowed transition-colors"
-            title="Back (Alt+Left)"
+            title={t.back}
             aria-label="Back"
           >
             <ChevronLeft size={16} />
@@ -107,7 +114,7 @@ export const NavBar: React.FC<NavBarProps> = ({
             onClick={onGoForward}
             disabled={!activeTab?.canGoForward}
             className="p-1.5 rounded-lg hover:bg-[var(--bg-surface-hover)] hover:text-[var(--text-primary)] disabled:opacity-25 disabled:hover:bg-transparent disabled:cursor-not-allowed transition-colors"
-            title="Forward (Alt+Right)"
+            title={t.forward}
             aria-label="Forward"
           >
             <ChevronRight size={16} />
@@ -115,7 +122,7 @@ export const NavBar: React.FC<NavBarProps> = ({
           <button
             onClick={onReload}
             className="p-1.5 rounded-lg hover:bg-[var(--bg-surface-hover)] hover:text-[var(--text-primary)] transition-colors"
-            title={activeTab?.isLoading ? 'Loading page... (Click to reload)' : 'Reload page (Ctrl+R / F5)'}
+            title={t.reload}
             aria-label="Reload"
           >
             <RotateCw size={15} className={activeTab?.isLoading ? 'animate-spin text-[var(--accent)]' : ''} />
@@ -126,7 +133,7 @@ export const NavBar: React.FC<NavBarProps> = ({
             className={`p-1.5 rounded-lg hover:bg-[var(--bg-surface-hover)] transition-colors disabled:opacity-25 disabled:hover:bg-transparent disabled:cursor-not-allowed ${
               isBookmarked ? 'text-[var(--accent)]' : 'hover:text-[var(--text-primary)]'
             }`}
-            title={isBookmarked ? 'إزالة من المفضلة' : 'إضافة إلى المفضلة'}
+            title={t.bookmark}
             aria-label={isBookmarked ? 'Remove bookmark' : 'Add bookmark'}
           >
             <Star size={15} fill={isBookmarked ? 'currentColor' : 'none'} />
@@ -142,15 +149,28 @@ export const NavBar: React.FC<NavBarProps> = ({
           />
         </div>
 
-        {/* WarWick AI Assistant Toggle & Shield */}
+        {/* Right Tools: Language Switcher, Privacy Shield & AI Assistant */}
         <div className="flex items-center gap-1.5 app-no-drag">
+          {/* Language Switcher Pill */}
+          {onToggleLanguage && (
+            <button
+              type="button"
+              onClick={onToggleLanguage}
+              className="flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-mono font-medium border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-hover)] transition-all cursor-pointer shadow-sm"
+              title={language === 'en' ? 'التحويل إلى العربية' : 'Switch to English'}
+            >
+              <Languages size={12} className="text-[var(--accent)]" />
+              <span>{language === 'en' ? 'عربي' : 'EN'}</span>
+            </button>
+          )}
+
           {/* Privacy Shield Indicator */}
           <div
             className="flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium text-[var(--accent)] bg-[var(--accent-soft)] border border-[var(--border-accent-soft)] select-none cursor-default"
             title="WarWick Shield: Ads & Trackers Blocked"
           >
             <ShieldCheck size={14} className="text-[var(--accent)]" />
-            <span className="hidden md:inline text-[11px] font-mono">Protected</span>
+            <span className="hidden md:inline text-[11px] font-mono">{translations[language].common.protected}</span>
           </div>
 
           <button
@@ -164,11 +184,11 @@ export const NavBar: React.FC<NavBarProps> = ({
                 ? 'bg-[var(--accent-soft-strong)] text-[var(--accent-bright)] border-[var(--border-accent)]'
                 : 'bg-[var(--bg-surface)] text-[var(--text-secondary)] border-[var(--border-subtle)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-hover)]'
             }`}
-            title="مساعد WarWick الذكي (Ctrl+J)"
-            aria-label="مساعد WarWick الذكي"
+            title="WarWick AI Copilot (Ctrl+J)"
+            aria-label="WarWick AI Copilot"
           >
             <Sparkles size={12} className="text-[var(--accent)]" />
-            <span className="leading-none">AI</span>
+            <span className="leading-none">{translations[language].common.aiAssistant}</span>
           </button>
         </div>
       </div>
